@@ -5,47 +5,81 @@ Created on Sat Apr 21 03:37:38 2018
 @author: Arjun Nath
 """
 
+import sys
 from name_base_class import Name
 
 class FullName(Name) :
+    '''
+    Class FullName inherits from class Name.
+    It adds several new methods to the existing methods from Name
+    '''
     
-    def __init__(self, firstname ="", lastname = "", middlename = "", title = None):
-        super().__init__(firstname, lastname, middlename)
+    def __init__(self, fname ="", mname = "", lname = "", title = None):
+        '''
+        Initalizer - if lastname is empty ,then midddlname is lastname
+        Empty first name is not allowed
+        '''
+        if fname == "" :
+            raise Exception("First Name cannot be empty")
+        elif lname == "" and mname != "":
+            lname = mname
+            mname = ""
+            super().__init__(fname, lname)
+        else :
+            super().__init__(fname, mname, lname)
         self.title = title
-
-    @classmethod 
-    def get_firstname(self):
-        return self.firstname
-
-    @classmethod 
-    def get_middlename(self):
-        return self.middlename
-
-    @classmethod
-    def get_lastnamename(self):
-        return self.lastname
-
-    @classmethod 
-    def set_firstname(self, fname):
-        self.firstname = fname
-
-    @classmethod 
-    def set_middlename(self, mname):
-        self.middlename = mname
-
-    @classmethod
-    def set_lastnamename(self, lname):
-        self.lastname = lname
 
     def set_title(self, strtitle):
         self.title = strtitle
 
-    def get_initials(self) :
-        return "initials"
-    
-    def get_fullname(self) :
-        if self.middlename != "" :
-            return self.firstname + " " + self.middlename + " " + self.lastname
-        else :
-            return self.firstname + " " + self.lastname
+    def get_full_name(self):
+        '''
+        :return full name as First Name, Mid Name, Last Name
+        '''
+        exception_message = None
+        try:
+            if self.middlename is not None :
+                names = (self.firstname, self.middlename, self.lastname)
+            else :
+                names = (self.firstname, self.lastname)
+            full_name = self.STR_SPACE.join(names)
+        except:
+            exception_message = sys.exc_info()[0]
+        return full_name, exception_message
 
+    def get_capitalized_name(self):
+        '''
+        :return capitalized full name
+        '''
+        exception_message = None
+        try:
+            full_name, err = self.get_full_name()
+        except:
+            exception_message = sys.exc_info()[0]        
+        return full_name.upper() , exception_message
+
+    def get_initials(self) :
+        '''
+        :return capitalized initials
+        '''
+        full_name, err = self.get_full_name()
+        names = full_name.split(" ")
+        initials = ""
+        for n in names :
+            initials += n[0].upper() + self.STR_DOT
+        return initials
+    
+    @staticmethod
+    def split_full_name(str_full_name) :
+        '''
+        :return tuple of names out of full name
+        '''
+        names = str_full_name.split(" ")
+        length = len(names)
+        if length == 3 :    
+            fname, midname, lname = names
+            return (fname, midname, lname)
+        if length == 2 :
+            fname, lname = names
+            return (fname, lname)
+        
